@@ -133,13 +133,12 @@ def process_application(app_name, app_id, log_file, output_txt_file, output_csv_
             os.remove(log_file)
 
         source_path = os.path.join(SOURCES, f'{app_name}')
-        def check_zip_file(source_path):
+        def check_files(source_path):
             for file in os.listdir(source_path):
-                if file.endswith(".zip"):
-                    return True
+                return True
             return False
 
-        if os.path.exists(source_path) and check_zip_file(source_path):
+        if os.path.exists(source_path) and check_files(source_path):
             logging.info(f'Analysing Application: {app_name} ......')
             print(f'Analysing Application: {app_name} .....')
             completed_process = subprocess.run([
