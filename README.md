@@ -26,29 +26,31 @@ Overall, the script aims to streamline and automate the process of application a
 4.	**Prepare Input Data**: Prepare a file containing the list of applications to be analyzed, with each entry in the format ApplicationName;ApplicationID.
 
 #### **Usage:**
-1.	**Execute Script**: Run the script by executing python automated_analysis_script.py.
+1.	**Execute Script**: Run the script by executing python HL_Automated_analysis.py.
 2.	**Monitor Progress**: Monitor the console for progress updates on application analysis.
 3.	**Review Logs**: Check the log files generated in the specified log folder for detailed information about the analysis process.
 
-#### **Configuration:**
+### **Configuration:**
 Ensure the config.properties file is correctly configured with the following parameters:
-•	**PERL**: Path to the Perl installation directory.
-•	**ANALYZER_DIR**: Path to the directory containing the HighLight Analyzer tool.
-•	**SOURCES**: Path to the directory containing the source files of the applications to be analyzed.
-•	**IGNORED_DIR**: Directories to be ignored during analysis.
-•	**IGNORED_PATHS**: Specific paths to be ignored during analysis.
-•	**IGNORED_FILES**: File names to be ignored during analysis.
-•	**URL**: URL for server communication.
-•	**HIGHLIGHT_EXE**: Path to the HighLight Analyzer executable file.
-•	**LOG_FOLDER**: Path to the folder where log files will be stored.
-•	**COMPANY_ID**: Identifier for the company.
-•	**TOKEN:** Authentication token for server communication.
-•	**CONFIG**: Configuration folder path.
-•	**RESULTS**: Path to the folder where analysis results will be stored.
-•	**APPLICATIONS_FILE_PATH**: Path to the file containing the list of applications.
-•	**BATCH_SIZE**: Number of applications to be processed concurrently (default is 1).
-•	**OUTPUT_FOLDER**: Path to the folder where output files will be stored.
-•	**MAX_BATCHES**: Maximum number of batches to process.
+
+- **PERL**: Path to the Perl installation directory.
+- **ANALYZER_DIR**: Path to the directory containing the HighLight Analyzer tool.
+- **SOURCES**: Path to the directory containing the source files of the applications to be analyzed.
+- **IGNORED_DIR**: Directories to be ignored during analysis.
+- **IGNORED_PATHS**: Specific paths to be ignored during analysis.
+- **IGNORED_FILES**: File names to be ignored during analysis.
+- **URL**: URL for server communication.
+- **HIGHLIGHT_EXE**: Path to the HighLight Analyzer executable file.
+- **LOG_FOLDER**: Path to the folder where log files will be stored.
+- **COMPANY_ID**: Identifier for the company.
+- **TOKEN**: Authentication token for server communication.
+- **CONFIG**: Configuration folder path.
+- **RESULTS**: Path to the folder where analysis results will be stored.
+- **APPLICATIONS_FILE_PATH**: Path to the file containing the list of applications.
+- **BATCH_SIZE**: Number of applications to be processed concurrently (default is 1).
+- **OUTPUT_FOLDER**: Path to the folder where output files will be stored.
+- **MAX_BATCHES**: Maximum number of batches to process.
+
 
 #### **Output:**
 1.	**Summary CSV File**: A CSV file containing the summary of the analysis results.
@@ -57,7 +59,7 @@ Ensure the config.properties file is correctly configured with the following par
 
 #### **Sample Usage:**
 Copy code
-python automated_analysis_script.py
+python HL_Automated_analysis.py
 
 #### **Troubleshooting:**
 •	Ensure all paths specified in the configuration file are correct and accessible.
