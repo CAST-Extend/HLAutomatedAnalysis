@@ -133,7 +133,13 @@ def process_application(app_name, app_id, log_file, output_txt_file, output_csv_
             os.remove(log_file)
 
         source_path = os.path.join(SOURCES, f'{app_name}')
-        if os.path.exists(source_path):
+        def check_zip_file(source_path):
+            for file in os.listdir(source_path):
+                if file.endswith(".zip"):
+                    return True
+            return False
+
+        if os.path.exists(source_path) and check_zip_file(source_path):
             logging.info(f'Analysing Application: {app_name} ......')
             print(f'Analysing Application: {app_name} .....')
             completed_process = subprocess.run([
@@ -166,9 +172,9 @@ def process_application(app_name, app_id, log_file, output_txt_file, output_csv_
             # logging.info(f'Return code: {completed_process.returncode}')
         else:
             status = "Failed"
-            reason = "Source not present"
-            logging.error(f'Analysis for the Application: {app_name} is failed because source not present.\n')
-            print(f'Analysis for the Application: {app_name} is failed because source not present.\n')
+            reason = "Source code not present"
+            logging.error(f'Analysis for the Application: {app_name} is failed because source code not present.\n')
+            print(f'Analysis for the Application: {app_name} is failed because source code not present.\n')
             start_time, end_time, execution_time = 'N/A', 'N/A', 'N/A'
 
     except subprocess.CalledProcessError as e:
