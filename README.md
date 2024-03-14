@@ -26,7 +26,7 @@ Overall, the script aims to streamline and automate the process of application a
 4.	**Prepare Input Data**: Prepare a file containing the list of applications to be analyzed, with each entry in the format ApplicationName;ApplicationID.
 
 #### **Usage:**
-1.	**Execute Script**: Run the script by executing python automated_analysis_script.py.
+1.	**Execute Script**: Run the script by executing python HL_Automated_analysis.py.
 2.	**Monitor Progress**: Monitor the console for progress updates on application analysis.
 3.	**Review Logs**: Check the log files generated in the specified log folder for detailed information about the analysis process.
 
@@ -59,7 +59,7 @@ Ensure the config.properties file is correctly configured with the following par
 
 #### **Sample Usage:**
 Copy code
-python automated_analysis_script.py
+python HL_Automated_analysis.py
 
 #### **Troubleshooting:**
 •	Ensure all paths specified in the configuration file are correct and accessible.
