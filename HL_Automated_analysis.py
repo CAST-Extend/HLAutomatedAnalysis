@@ -36,49 +36,63 @@ def validate_config(properties):
                        'APPLICATIONS_FILE_PATH', 'BATCH_SIZE', 'OUTPUT_FOLDER']
     for key, value in properties.items():
         if key =='PERL' and not os.path.exists(value):
-            print(f"{key} Folder -> {value} does not exists.")
-            raise ValueError(f"{key} Folder -> {value} does not exists.")
+            print(f"Program stopped bacause {key} Folder -> {value} does not exists!")
+            raise ValueError(f"Program stopped bacause {key} Folder -> {value} does not exists!")
         
         if key =='ANALYZER_DIR' and not os.path.exists(value):
-            print(f"{key} Folder -> {value} does not exists.")
-            raise ValueError(f"{key} Folder -> {value} does not exists.")
+            print(f"Program stopped bacause {key} Folder -> {value} does not exists.")
+            raise ValueError(f"Program stopped bacause {key} Folder -> {value} does not exists.")
         
         if key =='SOURCES' and not os.path.exists(value):
-            print(f"{key} Folder -> {value} does not exists.")
-            raise ValueError(f"{key} Folder -> {value} does not exists.")
+            print(f"Program stopped bacause {key} Folder -> {value} does not exists.")
+            raise ValueError(f"Program stopped bacause {key} Folder -> {value} does not exists.")
         
         if key =='HIGHLIGHT_EXE' and not os.path.isfile(value):
-            print(f"{key} File -> {value} does not exists.")
-            raise ValueError(f"{key} File -> {value} does not exists.")
+            print(f"Program stopped bacause {key} File -> {value} does not exists.")
+            raise ValueError(f"Program stopped bacause {key} File -> {value} does not exists.")
         
         if key =='LOG_FOLDER' and not os.path.exists(value):
-            print(f"{key} Folder -> {value} does not exists.")
-            raise ValueError(f"{key} Folder -> {value} does not exists.")
+            print(f"Program stopped bacause {key} Folder -> {value} does not exists.")
+            raise ValueError(f"Program stopped bacause {key} Folder -> {value} does not exists.")
         
         if key =='CONFIG' and not os.path.exists(value):
-            print(f"{key} Folder -> {value} does not exists.")
-            raise ValueError(f"{key} Folder -> {value} does not exists.")
+            print(f"Program stopped bacause {key} Folder -> {value} does not exists.")
+            raise ValueError(f"Program stopped bacause {key} Folder -> {value} does not exists.")
         
         if key =='RESULTS' and not os.path.exists(value):
-            print(f"{key} Folder -> {value} does not exists.")
-            raise ValueError(f"{key} Folder -> {value} does not exists.")
+            print(f"Program stopped bacause {key} Folder -> {value} does not exists.")
+            raise ValueError(f"Program stopped bacause {key} Folder -> {value} does not exists.")
         
         if key =='APPLICATIONS_FILE_PATH' and not os.path.isfile(value):
-            print((f"{key} File -> {value} does not exists."))
-            raise ValueError(f"{key} File -> {value} does not exists.")
+            print((f"Program stopped bacause {key} File -> {value} does not exists."))
+            raise ValueError(f"Program stopped bacause {key} File -> {value} does not exists.")
         
         if key =='OUTPUT_FOLDER' and not os.path.exists(value):
-            print(f"{key} Folder -> {value} does not exists.")
-            raise ValueError(f"{key} Folder -> {value} does not exists.")
+            print(f"Program stopped bacause {key} Folder -> {value} does not exists.")
+            raise ValueError(f"Program stopped bacause {key} Folder -> {value} does not exists.")
         
         if key =='URL':
             if not value.endswith(".com") or not validators.url(value):
-                print(f"The URL '{value}' is not valid.")
-                raise ValueError(f"The URL '{value}' is not valid.")
+                print(f"Program stopped bacause The URL '{value}' is not valid.")
+                raise ValueError(f"Program stopped bacause The URL '{value}' is not valid.")
         
     missing_params = [param for param in required_params if param not in properties]
     if missing_params:
-        raise ValueError(f"Missing required parameters in config.properties: {', '.join(missing_params)}")
+        print(f"Program stopped bacause required parameters not in the config.properties: {', '.join(missing_params)}")
+        raise ValueError(f"Program stopped bacause required parameters not in the config.properties: {', '.join(missing_params)}")
+
+def check_duplicate_app_ids(applications):
+    seen_ids = set()
+    duplicates = []
+
+    for item in applications:
+        app_id = item[1]
+        if app_id in seen_ids:
+            duplicates.append(app_id)
+        else:
+            seen_ids.add(app_id)
+
+    return duplicates
 
 def create_fixed_batches(applications, num_batches):
     batch_size = len(applications) // num_batches
@@ -109,10 +123,11 @@ def calculate_execution_time(log_file_path):
             
             return str(start_time)[:-4], str(end_time)[:-4], round((execution_time.total_seconds() / 60) ,2)  # Convert to minutes
     except Exception as e:
+        print(f"Error reading log file {log_file_path}: {str(e)}")
         logging.error(f"Error reading log file {log_file_path}: {str(e)}")
         return None
 
-def process_application(app_name, app_id, log_file, output_txt_file):
+def process_application(app_name, app_id, log_file, output_txt_file, output_csv_file):
     try:
         if os.path.exists(log_file):
             os.remove(log_file)
@@ -141,17 +156,20 @@ def process_application(app_name, app_id, log_file, output_txt_file):
                 reason = "Application processed successfully"
                 logging.info(f'Analysed Application: {app_name}.\n')
                 print(f'Analysed Application: {app_name}.\n')
+                start_time, end_time, execution_time = calculate_execution_time(log_file)
             else:
                 status = "Failed"
                 reason = return_code_messages.get(completed_process.returncode, f"Unknown return code: {completed_process.returncode}")
-                logging.info(f'Analysis for the Application: {app_name} is failed with the reason -> {reason}.\n')
+                logging.error(f'Analysis for the Application: {app_name} is failed with the reason -> {reason}.\n')
                 print(f'Analysis for the Application: {app_name} is failed with the reason -> {reason}.\n')
+                start_time, end_time, execution_time = calculate_execution_time(log_file)
             # logging.info(f'Return code: {completed_process.returncode}')
         else:
             status = "Failed"
             reason = "Source not present"
-            logging.info(f'Analysis for the Application: {app_name} is failed because source not present.\n')
+            logging.error(f'Analysis for the Application: {app_name} is failed because source not present.\n')
             print(f'Analysis for the Application: {app_name} is failed because source not present.\n')
+            start_time, end_time, execution_time = 'N/A', 'N/A', 'N/A'
 
     except subprocess.CalledProcessError as e:
         status = "Failed"
@@ -159,15 +177,19 @@ def process_application(app_name, app_id, log_file, output_txt_file):
         logging.error(f'Error processing application: {app_name} - {reason}.\n')
         print(f'Error processing application: {app_name} - {reason}.\n')
         # logging.error('Application processing failed.')
-
-    start_time, end_time, execution_time = calculate_execution_time(log_file)
+        start_time, end_time, execution_time = calculate_execution_time(log_file)
 
     # Write output data to CSV
-    with open(output_txt_file, 'a', newline='') as csvfile:
+    with open(output_csv_file, 'a', newline='') as csvfile:
         writer = csv.writer(csvfile)
         writer.writerow([app_name, status, reason, log_file, start_time, end_time, execution_time])
 
-def process_batch(batch, thread_id, output_txt_file):
+    # Write output data to txt
+    with open(output_txt_file, 'a', newline='') as txtfile:
+        writer = csv.writer(txtfile)
+        writer.writerow([app_name, status, reason, log_file, start_time, end_time, execution_time])
+
+def process_batch(batch, thread_id, output_txt_file, output_csv_file):
     thread_log_file = f"thread_{thread_id}_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.log"
     logging.basicConfig(filename=thread_log_file, level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
     logging.info(f'Thread {thread_id} started.')
@@ -178,24 +200,24 @@ def process_batch(batch, thread_id, output_txt_file):
     for app_name, app_id in batch:
         #log_file = os.path.join(LOG_FOLDER, f'HLAutomation_{app_name}.log')
         log_file = os.path.join(RESULTS, f'{app_name}\HLAutomation.log')
-        process_application(app_name, app_id, log_file, output_txt_file)
+        process_application(app_name, app_id, log_file, output_txt_file, output_csv_file)
 
     end_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     logging.info(f'Thread {thread_id} end time: {end_time}')
     logging.info(f'Thread {thread_id} finished.')
 
-def txt_to_csv(input_file, output_file, delimiter='\t'):
-    with open(input_file, 'r') as txtfile:
-        # Read the lines from the text file
-        lines = txtfile.readlines()
+# def txt_to_csv(input_file, output_file, delimiter='\t'):
+#     with open(input_file, 'r') as txtfile:
+#         # Read the lines from the text file
+#         lines = txtfile.readlines()
         
-        # Open the CSV file for writing
-        with open(output_file, 'w', newline='') as csvfile:
-            writer = csv.writer(csvfile, delimiter=delimiter)
+#         # Open the CSV file for writing
+#         with open(output_file, 'w', newline='') as csvfile:
+#             writer = csv.writer(csvfile, delimiter=delimiter)
             
-            # Write each line as a row in the CSV file
-            for line in lines:
-                writer.writerow(line.strip().split(delimiter))
+#             # Write each line as a row in the CSV file
+#             for line in lines:
+#                 writer.writerow(line.strip().split(delimiter))
 
 if __name__ == "__main__":
 
@@ -203,6 +225,11 @@ if __name__ == "__main__":
     try:
         # Read properties from the config file
         properties = read_properties_file('config\config.properties')
+
+        datetime_now = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        # Set up logging
+        log_file = os.path.join("HLAutomationLOG", f"script_log_{datetime_now}.log")
+        logging.basicConfig(filename=log_file, level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
         # Validate config properties
         validate_config(properties)
@@ -226,22 +253,25 @@ if __name__ == "__main__":
         OUTPUT_FOLDER = properties.get('OUTPUT_FOLDER')
         MAX_BATCHES = properties.get('MAX_BATCHES')
 
-        datetime_now = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        # Set up logging
-        log_file = os.path.join(OUTPUT_FOLDER, f"script_log_{datetime_now}.log")
-        logging.basicConfig(filename=log_file, level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-
         # Check if the APPLICATIONS_FILE_PATH is specified
         if APPLICATIONS_FILE_PATH is None:
-            raise ValueError("'APPLICATIONS_FILE_PATH' is not specified in config.properties")
+            print("Program stopped Because 'APPLICATIONS_FILE_PATH' is not specified in config.properties")
+            raise ValueError("Program stopped Because 'APPLICATIONS_FILE_PATH' is not specified in config.properties")
 
         # Check if the OUTPUT_FOLDER is specified
         if OUTPUT_FOLDER is None:
-            raise ValueError("'OUTPUT_FOLDER' is not specified in config.properties")
+            logging.error("Program stopped Because 'OUTPUT_FOLDER' is not specified in config.properties")
+            raise ValueError("Program stopped Because 'OUTPUT_FOLDER' is not specified in config.properties")
 
         logging.info('------------------------------------------------')
         logging.info(f'APPLICATIONS CONFIG PATH: {APPLICATIONS_FILE_PATH}')
         logging.info('------------------------------------------------')
+
+        # Create the output csv file
+        output_csv_file = os.path.join(OUTPUT_FOLDER, f'summary_{datetime_now}.csv')
+        with open(output_csv_file, 'w', newline='') as csvfile:
+            writer = csv.writer(csvfile)
+            writer.writerow(['Application Name', 'Status', 'Reason', 'Log File Path', 'Start Time', 'End Time', 'Total Time in Minutes'])
 
         # Create the output txt file
         output_txt_file = os.path.join(OUTPUT_FOLDER, f'summary_{datetime_now}.txt')
@@ -254,6 +284,16 @@ if __name__ == "__main__":
             applications = [line.strip().split(';') for line in file]
             applications = applications[1:]
             # print(applications)
+
+            duplicates = check_duplicate_app_ids(applications)
+            if duplicates:
+                logging.error(f'Duplicate Application IDs Found......')
+                print(f'Duplicate Application IDs Found......')
+                for app_id in duplicates:
+                    logging.error(f'Duplicate Application ID - {app_id}')
+                    print(f'Duplicate Application ID - {app_id}')
+                print("Program stopped Because Duplicate Application IDs Found!")
+                raise ValueError("Program stopped Because Duplicate Application IDs Found!")
 
         # Record start time
         start_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -278,7 +318,7 @@ if __name__ == "__main__":
         # Process batches using multi-threading
         threads = []
         for i, batch in enumerate(batches, start=1):
-            thread = threading.Thread(target=process_batch, args=(batch, i, output_txt_file))
+            thread = threading.Thread(target=process_batch, args=(batch, i, output_txt_file, output_csv_file))
             threads.append(thread)
             thread.start()
 
@@ -286,13 +326,9 @@ if __name__ == "__main__":
         for thread in threads:
             thread.join()
 
-        input_file = output_txt_file
-        output_file = os.path.join(OUTPUT_FOLDER, f'summary_{datetime_now}.csv')
-        txt_to_csv(input_file, output_file)
-
         # Record end time
         end_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         logging.info(f'End Time: {end_time}')
 
     except Exception as e:
-        logging.error(f'Error: {e}')
+        logging.error(f'{e}')
