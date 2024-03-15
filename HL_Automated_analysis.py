@@ -33,7 +33,7 @@ def read_properties_file(filename):
 def validate_config(properties):
     required_params = ['PERL', 'ANALYZER_DIR', 'SOURCES', 'IGNORED_DIR', 'IGNORED_PATHS', 'IGNORED_FILES',
                        'URL', 'HIGHLIGHT_EXE', 'LOG_FOLDER', 'COMPANY_ID', 'TOKEN', 'CONFIG', 'RESULTS',
-                       'APPLICATIONS_FILE_PATH', 'BATCH_SIZE', 'OUTPUT_FOLDER']
+                       'APPLICATIONS_FILE_PATH', 'BATCH_SIZE']
     for key, value in properties.items():
         if key =='PERL' and not os.path.exists(value):
             print(f"Program stopped bacause {key} Folder -> {value} does not exists!")
@@ -66,10 +66,6 @@ def validate_config(properties):
         if key =='APPLICATIONS_FILE_PATH' and not os.path.isfile(value):
             print((f"Program stopped bacause {key} File -> {value} does not exists."))
             raise ValueError(f"Program stopped bacause {key} File -> {value} does not exists.")
-        
-        if key =='OUTPUT_FOLDER' and not os.path.exists(value):
-            print(f"Program stopped bacause {key} Folder -> {value} does not exists.")
-            raise ValueError(f"Program stopped bacause {key} Folder -> {value} does not exists.")
         
         if key =='URL':
             if not value.endswith(".com") or not validators.url(value):
@@ -231,14 +227,6 @@ if __name__ == "__main__":
         # Read properties from the config file
         properties = read_properties_file('config\config.properties')
 
-        datetime_now = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        # Set up logging
-        log_file = os.path.join("HLAutomationLOG", f"script_log_{datetime_now}.log")
-        logging.basicConfig(filename=log_file, level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-
-        # Validate config properties
-        validate_config(properties)
-
         # Extract properties
         PERL = properties.get('PERL')
         ANALYZER_DIR = properties.get('ANALYZER_DIR')
@@ -255,31 +243,38 @@ if __name__ == "__main__":
         RESULTS = properties.get('RESULTS')
         APPLICATIONS_FILE_PATH = properties.get('APPLICATIONS_FILE_PATH')
         BATCH_SIZE = int(properties.get('BATCH_SIZE', 1))  # Default batch size is 1
-        OUTPUT_FOLDER = properties.get('OUTPUT_FOLDER')
         MAX_BATCHES = properties.get('MAX_BATCHES')
+
+        datetime_now = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        # Set up logging
+        log_file = os.path.join(LOG_FOLDER, f"script_log_{datetime_now}.log")
+        logging.basicConfig(filename=log_file, level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+        # Validate config properties
+        validate_config(properties)
 
         # Check if the APPLICATIONS_FILE_PATH is specified
         if APPLICATIONS_FILE_PATH is None:
             print("Program stopped Because 'APPLICATIONS_FILE_PATH' is not specified in config.properties")
             raise ValueError("Program stopped Because 'APPLICATIONS_FILE_PATH' is not specified in config.properties")
 
-        # Check if the OUTPUT_FOLDER is specified
-        if OUTPUT_FOLDER is None:
-            logging.error("Program stopped Because 'OUTPUT_FOLDER' is not specified in config.properties")
-            raise ValueError("Program stopped Because 'OUTPUT_FOLDER' is not specified in config.properties")
+        # Check if the LOG_FOLDER is specified
+        if LOG_FOLDER is None:
+            logging.error("Program stopped Because 'LOG_FOLDER' is not specified in config.properties")
+            raise ValueError("Program stopped Because 'LOG_FOLDER' is not specified in config.properties")
 
         logging.info('------------------------------------------------')
         logging.info(f'APPLICATIONS CONFIG PATH: {APPLICATIONS_FILE_PATH}')
         logging.info('------------------------------------------------')
 
         # Create the output csv file
-        output_csv_file = os.path.join(OUTPUT_FOLDER, f'summary_{datetime_now}.csv')
+        output_csv_file = os.path.join(LOG_FOLDER, f'summary_{datetime_now}.csv')
         with open(output_csv_file, 'w', newline='') as csvfile:
             writer = csv.writer(csvfile)
             writer.writerow(['Application Name', 'Status', 'Reason', 'Log File Path', 'Start Time', 'End Time', 'Total Time in Minutes'])
 
         # Create the output txt file
-        output_txt_file = os.path.join(OUTPUT_FOLDER, f'summary_{datetime_now}.txt')
+        output_txt_file = os.path.join(LOG_FOLDER, f'summary_{datetime_now}.txt')
         with open(output_txt_file, 'w', newline='') as txtfile:
             writer = csv.writer(txtfile)
             writer.writerow(['Application Name', 'Status', 'Reason', 'Log File Path', 'Start Time', 'End Time', 'Total Time in Minutes'])
