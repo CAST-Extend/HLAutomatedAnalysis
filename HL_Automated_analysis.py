@@ -281,9 +281,12 @@ if __name__ == "__main__":
 
         # Read applications from the file
         with open(APPLICATIONS_FILE_PATH, 'r') as file:
-            applications = [line.strip().split(';') for line in file]
-            applications = applications[1:]
+            apps = [line.strip().split(';') for line in file]
+            apps = apps[1:]
+            applications = []
             # print(applications)
+            for app in apps:
+                applications.append([app[0].strip(),app[1].strip()])
 
             duplicates = check_duplicate_app_ids(applications)
             if duplicates:
